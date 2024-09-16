@@ -1,3 +1,7 @@
+/**
+ * Represents a base class for shader sketches.
+ * @class
+ */
 import { 
   createProgramInfo, 
   createBufferInfoFromArrays, 
@@ -8,6 +12,12 @@ import {
 } from "twgl.js";
 
 export default class ShaderSketchBase {
+  /**
+   * Constructs a new instance of ShaderSketchBase. Not intended to be called directly, and instead used as a base class.
+   * @param {HTMLCanvasElement} canvas - The canvas element to render the shader sketch.
+   * @param {string} fragmentShader - The fragment shader code.
+   * @param {string} vertexShader - The vertex shader code.
+   */
   constructor(canvas, fragmentShader, vertexShader) {
     this.canvas = canvas;
     this.gl = canvas.getContext('webgl2');
@@ -40,7 +50,13 @@ export default class ShaderSketchBase {
       this.uniforms.u_mouse = this.getNormalizedMousePosition(event);
     });
   }
-
+  
+  /**
+   * Renders the shader sketch. Used through requestAnimationFrame looping.
+   * 
+   * @private
+   * @param {number} time - The current time in milliseconds.
+   */
   render(time) {
     resizeCanvasToDisplaySize(this.canvas);
     this.update(time);
@@ -54,6 +70,12 @@ export default class ShaderSketchBase {
     this.animationFrameId = requestAnimationFrame(this.render.bind(this));
   }
 
+  /**
+   * Updates the shader sketch base. Intended to be overridden by subclasses. 
+   * Call super.update(time) to update the default uniforms. Called before the sketch is rendered.
+   * 
+   * @param {number} time - The current time in milliseconds.
+   */
   update(time) {
     Object.assign(this.uniforms, {
       u_time: time * 0.001,
@@ -61,14 +83,28 @@ export default class ShaderSketchBase {
     });
   }
 
+  /**
+   * Starts the rendering process by requesting an animation frame.
+   */
   start() {
     this.animationFrameId = requestAnimationFrame(this.render.bind(this));
   }
 
+  /**
+   * Stops the animation frame.
+   */
   stop() {
     cancelAnimationFrame(this.animationFrameId);
   }
 
+
+  /**
+   * Calculates the mouse position normalized to a range of [0, 1]. Intended to be used in the mousemove event listener.
+   * 
+   * @private
+   * @param {MouseEvent} event - The mouse event object.
+   * @returns {number[]} - The normalized mouse position as an array of two values.
+   */
   getNormalizedMousePosition(event) {
     return [
       event.offsetX / this.canvas.clientWidth,
