@@ -35,12 +35,15 @@ export default class ShaderSketchBase {
       u_resolution: [this.canvas.width, this.canvas.height],
       u_mouse: [0, 0],
     };
+
+    this.canvas.addEventListener("mousemove", (event) => {
+      this.uniforms.u_mouse = this.getNormalizedMousePosition(event);
+    });
   }
 
   render(time) {
     resizeCanvasToDisplaySize(this.canvas);
-    this.uniforms.u_time = time * 0.001;
-    this.uniforms.u_resolution = [this.canvas.width, this.canvas.height];
+    this.update(time);
 
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     this.gl.useProgram(this.programInfo.program);
@@ -51,11 +54,25 @@ export default class ShaderSketchBase {
     this.animationFrameId = requestAnimationFrame(this.render.bind(this));
   }
 
+  update(time) {
+    Object.assign(this.uniforms, {
+      u_time: time * 0.001,
+      u_resolution: [this.canvas.width, this.canvas.height],
+    });
+  }
+
   start() {
     this.animationFrameId = requestAnimationFrame(this.render.bind(this));
   }
 
   stop() {
     cancelAnimationFrame(this.animationFrameId);
+  }
+
+  getNormalizedMousePosition(event) {
+    return [
+      event.offsetX / this.canvas.clientWidth,
+      event.offsetY / this.canvas.clientHeight,
+    ];
   }
 }
